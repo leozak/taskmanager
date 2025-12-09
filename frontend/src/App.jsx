@@ -11,10 +11,10 @@ function App() {
   const [year, setYear] = useState(nowDate.getUTCFullYear());
   const [day, setDay] = useState(nowDate.getUTCDate());
 
-  const [todo, setTodo] = useState([]);
+  const [todos, setTodos] = useState([]);
 
   useEffect(() => {
-    setTodo(api("/todos"));
+    setTodos(api("/todos"));
   }, []);
 
   return (
@@ -36,8 +36,8 @@ function App() {
           setMonth={setMonth}
           setYear={setYear}
           setDay={setDay}
-          todo={todo}
-          setTodo={setTodo}
+          todos={todos}
+          setTodos={setTodos}
         />
       </div>
     </>
