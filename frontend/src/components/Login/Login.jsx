@@ -4,6 +4,8 @@ import { PiUserCirclePlusFill } from "react-icons/pi";
 import { FaUserEdit } from "react-icons/fa";
 import { ImSpinner6 } from "react-icons/im";
 
+const url_base = "http://127.0.0.1:8000";
+
 const Login = () => {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
@@ -56,7 +58,7 @@ const Login = () => {
     }
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     let is_ok = true;
     if (name === "") {
       setErrorName({ error: true, message: "Please enter a name." });
@@ -83,6 +85,39 @@ const Login = () => {
       is_ok = false;
     } else {
       setErrorPassword({ error: false, message: "" });
+    }
+
+    try {
+      const response = await fetch(url_base + "/users/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          name: name,
+          password: password,
+        }),
+      }).catch((error) => {
+        console.log(error);
+      });
+
+      const data = await response.json();
+
+      if (!data.sussess) {
+        is_ok = false;
+        const message = data.message;
+        if (message.indexOf("exists") != -1) {
+          setErrorUsername({
+            error: true,
+            message: "User already exists",
+          });
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
 
     //
@@ -201,6 +236,9 @@ const Login = () => {
               <button
                 onClick={() => {
                   setNewUser(true);
+                  setErrorName({ error: false, message: "" });
+                  setErrorUsername({ error: false, message: "" });
+                  setErrorPassword({ error: false, message: "" });
                   setPassword("");
                 }}
                 className="text-cyan-800 hover:underline hover:text-cyan-600 hover:cursor-pointer"
@@ -297,6 +335,9 @@ const Login = () => {
               <button
                 onClick={() => {
                   setNewUser(false);
+                  setErrorName({ error: false, message: "" });
+                  setErrorUsername({ error: false, message: "" });
+                  setErrorPassword({ error: false, message: "" });
                   setPassword("");
                 }}
                 className="text-cyan-800 hover:underline hover:text-cyan-600 hover:cursor-pointer"

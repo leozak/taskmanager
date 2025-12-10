@@ -3,13 +3,16 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import sessionmaker, declarative_base
+from pydantic import BaseModel
 
 # Configura o FastAPI
 app = FastAPI(title="To-do List Schedule", version="0.1")
 
+origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -22,19 +25,33 @@ session = Session()
 
 Base = declarative_base()
 
+class UserSchema(BaseModel):
+    name: str
+    username: str
+    password: str
+
 # Tabela de usuários
 class User(Base):
     __tablename__ = "users"
 
-    username = Column("username", String, primary_key=True, unique=True)
     name = Column("name", String)
+    username = Column("username", String, primary_key=True, unique=True)
     password = Column("password", String)
 
-    def __init__(self, username, name, password):
-        self.username = username
+    def __init__(self, name, username, password):
         self.name = name
+        self.username = username
         self.password = password
 
+
+class TodosSchema(BaseModel):
+    id: int
+    title: str
+    description: str
+    priority: int
+    date: str
+    done: bool
+    username: str
 
 # Tabela de to-dos
 class Todo(Base):
@@ -44,8 +61,8 @@ class Todo(Base):
     title = Column("title", String)
     description = Column("description", String)
     priority = Column("priority", Integer)
-    date = Column("date", String)
     done = Column("done", Boolean)
+    date = Column("date", String)
     username = Column("username", ForeignKey("users.username"))
 
     def __init__(self, title, description, username, priority=0, date=datetime.isoformat(datetime.now(), timespec="seconds"), done=False):
@@ -71,12 +88,37 @@ async def root(username: str):
 
 # Cria um novo usuário
 @app.post("/users/create")
-async def create_user(username: str, name: str, password: str):
-    """Cria um novo usuário."""
-    user = User(username, name, password)
-    session.add(user)
-    session.commit()
-    return {"message": "User created"}
+async def create_user(user: UserSchema):
+    """Creates a new user."""
+
+    try:
+        existing_user = session.query(User).filter_by(username=user.username).first()
+
+        if existing_user:
+            return {
+                "success": False,
+                "message": "User already exists"
+            }
+        else:
+            new_user = User(name=user.name, username=user.username, password=user.password)
+            session.add(new_user)
+            session.commit()
+            return {
+                "success": True,
+                "message": "User created",
+                "name": user.name,
+                "username": user.username
+            }
+    
+    except Exception as e:
+        session.rollback()
+        return {
+            "success": False,
+            "message": "Error creating user"
+        }
+    finally:
+        session.close()
+
 
 
 @app.post("/users/update")
