@@ -1,3 +1,4 @@
+import hashlib
 from datetime import datetime, timezone
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -81,7 +82,6 @@ class Todo(Base):
 # Cria as tabelas
 Base.metadata.create_all(bind=db)
 
-
 # DEV: Mostra todos os registros do DB
 @app.get("/{username}")
 async def root(username: str):
@@ -94,17 +94,16 @@ async def root(username: str):
 @app.post("/users/create")
 async def create_user(user: UserSchema):
     """Creates a new user."""
-
     try:
         existing_user = session.query(User).filter_by(username=user.username).first()
-
         if existing_user:
             return {
                 "success": False,
                 "message": "User already exists"
             }
         else:
-            new_user = User(name=user.name, username=user.username, password=user.password)
+            hashed_password = hashlib.sha256(user.password.encode()).hexdigest()
+            new_user = User(name=user.name, username=user.username, password=hashed_password)
             session.add(new_user)
             session.commit()
             return {
@@ -113,7 +112,6 @@ async def create_user(user: UserSchema):
                 "name": user.name,
                 "username": user.username
             }
-    
     except Exception as e:
         session.rollback()
         return {
@@ -125,44 +123,30 @@ async def create_user(user: UserSchema):
 
 
 
-@app.post("/users/update")
-async def update_user(username: str, name: str, password: str):
-    """Atualiza um usuário."""
-    user = session.query(User).filter(User.username == username).first()
-    user.name = name
-    user.password = password
-    session.commit()
-    return {"message": "User updated"}
+# @app.post("/users/update")
+# async def update_user(username: str, name: str, password: str):
+#     """Atualiza um usuário."""
+#     user = session.query(User).filter(User.username == username).first()
+#     user.name = name
+#     user.password = password
+#     session.commit()
+#     return {"message": "User updated"}
 
 
 @app.post("/users/login")
 async def login_user(user: LoginSchema):
     """Login de um usuário."""
-
-    print("LOGIN")
-
-    existing_user = session.query(User).filter_by(username=user.username, password=user.password).first()
-
+    hashed_password = hashlib.sha256(user.password.encode()).hexdigest()
+    existing_user = session.query(User).filter_by(username=user.username, password=hashed_password).first()
     if (existing_user):
-        print("username", existing_user.username)
-        print("password", existing_user.password)
         return {
                 "success": True,
                 "message": "User logged in",
+                "name": existing_user.name,
+                "username": existing_user.username
             }
     else:
         return {
                 "success": False,
                 "message": "User not found",
             }
-    
-
-    # if user and user.password == password:
-    #     return {"name": user.name,
-    #             "username": user.username,
-    #             "message": "Login successful",
-    #             "success": True,
-    #     }
-    # else:
-    #     return {"message": "Invalid username or password",
-    #             "success": False,}

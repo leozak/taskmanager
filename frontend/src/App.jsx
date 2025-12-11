@@ -16,6 +16,21 @@ function App() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const [user, setUser] = useState({
+    name: "",
+    username: "",
+  });
+
+  useEffect(() => {
+    if (sessionStorage.getItem("loggedIn")) {
+      setIsLoggedIn(true);
+      setUser({
+        name: sessionStorage.getItem("name"),
+        username: sessionStorage.getItem("username"),
+      });
+    }
+  }, []);
+
   useEffect(() => {
     setTodos(api("/todos"));
   }, []);
@@ -25,7 +40,7 @@ function App() {
       <div className="flex h-screen">
         {/* Login */}
         {!isLoggedIn ? (
-          <Login setIsLoggedIn={setIsLoggedIn} />
+          <Login setIsLoggedIn={setIsLoggedIn} setUser={setUser} />
         ) : (
           <>
             <SideBar

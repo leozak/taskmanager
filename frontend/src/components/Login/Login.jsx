@@ -6,7 +6,7 @@ import { ImSpinner6 } from "react-icons/im";
 
 const url_base = "http://127.0.0.1:8000";
 
-const Login = ({ setIsLoggedIn }) => {
+const Login = ({ setIsLoggedIn, setUser }) => {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -88,43 +88,46 @@ const Login = ({ setIsLoggedIn }) => {
     }
 
     // Send the data to the backend
-    try {
-      const response = await fetch(url_base + "/users/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: username,
-          name: name,
-          password: password,
-        }),
-      }).catch((error) => {
+    if (is_ok) {
+      try {
+        const response = await fetch(url_base + "/users/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: username,
+            name: name,
+            password: password,
+          }),
+        }).catch((error) => {
+          is_ok = false;
+          console.log(error);
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+          is_ok = false;
+          const message = data.message;
+          if (message.indexOf("exists") != -1) {
+            setErrorUsername({
+              error: true,
+              message: "User already exists",
+            });
+          }
+        }
+      } catch (error) {
         is_ok = false;
         console.log(error);
-      });
-
-      const data = await response.json();
-
-      if (!data.sussess) {
-        is_ok = false;
-        const message = data.message;
-        if (message.indexOf("exists") != -1) {
-          setErrorUsername({
-            error: true,
-            message: "User already exists",
-          });
-        }
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      is_ok = false;
-      console.log(error);
-    } finally {
-      setLoading(false);
     }
 
     if (is_ok) {
       setNewUser(false);
+      setPassword("");
     }
   };
 
@@ -175,6 +178,14 @@ const Login = ({ setIsLoggedIn }) => {
         if (data.success) {
           setLoginFailed(false);
           setIsLoggedIn(true);
+          setUser({
+            name: data.name,
+            username: data.username,
+          });
+
+          sessionStorage.setItem("loggedIn", true);
+          sessionStorage.setItem("name", data.name);
+          sessionStorage.setItem("username", data.username);
         } else {
           is_ok = false;
           setLoginFailed(true);
