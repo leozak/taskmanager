@@ -11,6 +11,7 @@ const TodoForm = ({ openForm, setCloseForm, action, todo }) => {
 
   const [confirmDiscartChanges, setConfirmDiscartChanges] = useState(false);
 
+  // Set the form initial values
   useEffect(() => {
     if (action === "edit") {
       setTitle(todo.title);
@@ -29,7 +30,43 @@ const TodoForm = ({ openForm, setCloseForm, action, todo }) => {
     }
   }, []);
 
-  // Press <Esc> to close the form
+  const handleCloseForm = () => {
+    const title = document.getElementById("title").value;
+    const description = document.getElementById("description").value;
+    const priority = document.getElementById("priority").value;
+    const date = document.getElementById("date").value;
+    const done = document.getElementById("done").checked;
+    const pin = document.getElementById("pin").checked;
+
+    if (action === "edit") {
+      if (
+        title === todo.title &&
+        description === todo.description &&
+        priority === todo.priority &&
+        date === todo.date &&
+        done === todo.done &&
+        pin === todo.pin
+      ) {
+        setCloseForm();
+      } else {
+        setConfirmDiscartChanges(true);
+      }
+    } else if (action === "add") {
+      if (
+        title === "" &&
+        description === "" &&
+        priority === "0" &&
+        pin === false &&
+        done === false
+      ) {
+        setCloseForm();
+      } else {
+        setConfirmDiscartChanges(true);
+      }
+    }
+  };
+
+  // Press <Esc> t'o close the form
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
@@ -78,7 +115,11 @@ const TodoForm = ({ openForm, setCloseForm, action, todo }) => {
 
   return (
     <div
-      className={`fixed flex inset-0 justify-center items-center transition-colors duration-300
+      onClick={() => {
+        (e) => e.stopPropagation();
+        handleCloseForm();
+      }}
+      className={`fixed flex inset-0 justify-center items-center opacity-90 transition-colors duration-300
         ${openForm ? "bg-black/90 visible" : "bg-black/0 invisible"}
         `}
     >
@@ -91,7 +132,7 @@ const TodoForm = ({ openForm, setCloseForm, action, todo }) => {
       >
         {/* MODAL CLOSE BUTTON */}
         <button
-          onClick={setCloseForm}
+          onClick={handleCloseForm}
           className="absolute top-2 right-2 p-1 rounded-sm text-neutral-600 hover:text-neutral-900 hover:cursor-pointer"
         >
           <IoClose className="w-6 h-6" />
@@ -187,16 +228,33 @@ const TodoForm = ({ openForm, setCloseForm, action, todo }) => {
       </div>
 
       {/* CONFIRM DISCARD CHANGES MODAL */}
-      <div className="fixed  p-6 m-20 bg-neutral-300/90 rounded-2xl shadow-xl shadow-black">
-        <h2 className="text-xl font-bold mb-6 text-red-700">
-          Discard changes?
-        </h2>
-        <p>You have unsaved changes. Are you sure you want to discard them?</p>
-        <button className="text-neutral-300 hover:text-neutral-100 bg-cyan-800 hover:bg-cyan-700 hover:cursor-pointer rounded-lg px-4 my-4">
-          Continue editing
-        </button>
-        <button>Discard changes</button>
-      </div>
+      {confirmDiscartChanges && (
+        <div className="fixed p-6 m-20 bg-neutral-300/90 rounded-2xl shadow-xl shadow-black">
+          <h2 className="text-xl font-bold mb-6 text-red-700">
+            Discard changes?
+          </h2>
+          <p>
+            You have unsaved changes. Are you sure you want to discard them?
+          </p>
+          <div className="text-center">
+            <button
+              onClick={() => setConfirmDiscartChanges(false)}
+              className="text-neutral-300 hover:text-neutral-100 bg-green-800 hover:bg-green-700 hover:cursor-pointer active:bg-green-600 rounded-lg py-2 px-4 mt-8 mx-4"
+            >
+              Continue editando
+            </button>
+            <button
+              onClick={() => {
+                setConfirmDiscartChanges(false);
+                setCloseForm();
+              }}
+              className="text-neutral-300 hover:text-neutral-100 bg-red-800 hover:bg-red-700 hover:cursor-pointer active:bg-red-600 rounded-lg py-2 px-4 my-4 mx-4"
+            >
+              Descartar mudanças
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

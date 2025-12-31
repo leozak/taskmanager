@@ -3,13 +3,15 @@ import Login from "./components/Login/Login";
 import Schedule from "./components/Schedule/Schedule";
 import SideBar from "./components/Sidebar/Sidebar";
 
+import DateProvider from "./context/DateContext.jsx";
+
 import api from "./api.js";
 
 const nowDate = new Date();
 
 function App() {
-  const [month, setMonth] = useState(nowDate.getUTCMonth());
   const [year, setYear] = useState(nowDate.getUTCFullYear());
+  const [month, setMonth] = useState(nowDate.getUTCMonth());
   const [day, setDay] = useState(nowDate.getUTCDate());
 
   const [todos, setTodos] = useState([]);
@@ -43,26 +45,35 @@ function App() {
           <Login setIsLoggedIn={setIsLoggedIn} setUser={setUser} />
         ) : (
           <>
-            <SideBar
-              nowMonth={month}
-              nowYear={year}
-              nowDay={day}
-              setMonth={setMonth}
+            <DateProvider
+              year={year}
               setYear={setYear}
+              month={month}
+              setMonth={setMonth}
+              day={day}
               setDay={setDay}
-              user={user}
-            />
+            >
+              <SideBar
+                nowMonth={month}
+                nowYear={year}
+                nowDay={day}
+                setMonth={setMonth}
+                setYear={setYear}
+                setDay={setDay}
+                user={user}
+              />
 
-            <Schedule
-              nowMonth={month}
-              nowYear={year}
-              nowDay={day}
-              setMonth={setMonth}
-              setYear={setYear}
-              setDay={setDay}
-              todos={todos}
-              setTodos={setTodos}
-            />
+              <Schedule
+                nowMonth={month}
+                nowYear={year}
+                nowDay={day}
+                setMonth={setMonth}
+                setYear={setYear}
+                setDay={setDay}
+                todos={todos}
+                setTodos={setTodos}
+              />
+            </DateProvider>
           </>
         )}
       </div>

@@ -1,4 +1,10 @@
+import { useContext } from "react";
+
+import { DateContext } from "../../context/DateContext";
+
 const ScheduleView = ({ todos }) => {
+  const { year, month, day } = useContext(DateContext);
+
   return (
     <div>
       <div className="inline-block">
@@ -11,6 +17,9 @@ const ScheduleView = ({ todos }) => {
             <div className="py-0.5 px-2">{todo.title}</div>
           </div>
         ))}
+        <div>
+          Year: {year} Month: {month + 1} Day: {day}
+        </div>
       </div>
     </div>
   );

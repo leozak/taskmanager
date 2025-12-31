@@ -1,6 +1,6 @@
 import NavBar from "./NavBar";
 import ScheduleView from "./ScheduleView";
-import AddNewTodo from "./AddNewTodo";
+import AddNewTask from "./AddNewTask";
 
 const Schedule = ({
   nowMonth,
@@ -27,7 +27,7 @@ const Schedule = ({
 
       <ScheduleView todos={todos} />
 
-      <AddNewTodo />
+      <AddNewTask />
     </div>
   );
 };
