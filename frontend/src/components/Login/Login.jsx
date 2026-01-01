@@ -38,11 +38,11 @@ const Login = ({ setIsLoggedIn, setUser }) => {
   const handleUsernameChange = (e) => {
     setUsername(e.target.value);
     if (e.target.value === "") {
-      setErrorUsername({ error: true, message: "Please enter a username." });
+      setErrorUsername({ error: true, message: "Informe um nome de usuário." });
     } else if (e.target.value.length < 6) {
       setErrorUsername({
         error: true,
-        message: "Username must be at least 6 characters long.",
+        message: "Nome de usuário deve ter pelo menos 6 caracteres.",
       });
     } else {
       setErrorUsername({ error: false, message: "" });
@@ -52,7 +52,7 @@ const Login = ({ setIsLoggedIn, setUser }) => {
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
     if (e.target.value === "") {
-      setErrorPassword({ error: true, message: "Please enter a password." });
+      setErrorPassword({ error: true, message: "Informe uma senha." });
     } else {
       setErrorPassword({ error: false, message: "" });
     }
@@ -61,19 +61,19 @@ const Login = ({ setIsLoggedIn, setUser }) => {
   const handleSignUp = async () => {
     let is_ok = true;
     if (name === "") {
-      setErrorName({ error: true, message: "Please enter a name." });
+      setErrorName({ error: true, message: "Informe um nome." });
       is_ok = false;
     } else {
       setErrorName({ error: false, message: "" });
     }
 
     if (username === "") {
-      setErrorUsername({ error: true, message: "Please enter a username." });
+      setErrorUsername({ error: true, message: "Informe um nome de usuário." });
       is_ok = false;
     } else if (username.length < 6) {
       setErrorUsername({
         error: true,
-        message: "Username must be at least 6 characters long.",
+        message: "Nome de usuário deve ter pelo menos 6 caracteres.",
       });
       is_ok = false;
     } else {
@@ -81,7 +81,7 @@ const Login = ({ setIsLoggedIn, setUser }) => {
     }
 
     if (password === "") {
-      setErrorPassword({ error: true, message: "Please enter a password." });
+      setErrorPassword({ error: true, message: "Informe uma senha." });
       is_ok = false;
     } else {
       setErrorPassword({ error: false, message: "" });
@@ -113,7 +113,7 @@ const Login = ({ setIsLoggedIn, setUser }) => {
           if (message.indexOf("exists") != -1) {
             setErrorUsername({
               error: true,
-              message: "User already exists",
+              message: "Nome de usuário já cadastrado.",
             });
           }
         }
@@ -135,12 +135,12 @@ const Login = ({ setIsLoggedIn, setUser }) => {
     let is_ok = true;
 
     if (username === "") {
-      setErrorUsername({ error: true, message: "Please enter a username." });
+      setErrorUsername({ error: true, message: "Informe um nome de usuário." });
       is_ok = false;
     } else if (username.length < 6) {
       setErrorUsername({
         error: true,
-        message: "Username must be at least 6 characters long.",
+        message: "Nome de usuário deve ter pelo menos 6 caracteres.",
       });
       is_ok = false;
     } else {
@@ -148,7 +148,7 @@ const Login = ({ setIsLoggedIn, setUser }) => {
     }
 
     if (password === "") {
-      setErrorPassword({ error: true, message: "Please enter a password." });
+      setErrorPassword({ error: true, message: "Informe uma senha." });
       is_ok = false;
     } else {
       setErrorPassword({ error: false, message: "" });
@@ -215,27 +215,27 @@ const Login = ({ setIsLoggedIn, setUser }) => {
 
             {/* Login title */}
             <h1 className="block text-3xl text-center font-bold text-gray-600">
-              Welcome Back!
+              Bem vindo de volta!
             </h1>
             <p className="text-center mt-2">
-              Sign in to organize your life efficiently.
+              Por favor, insira seu nome de usuário e senha para entrar.
             </p>
 
             {/* Login form */}
             <div className="py-4 px-8">
               {loginFailed && (
                 <p className="text-red-500 text-base text-center mb-4">
-                  Invalid username or password.
+                  Nome de usuário ou senha incorretos.
                 </p>
               )}
-              <label htmlFor="username">Username*</label>
+              <label htmlFor="username">Nome de usuário*</label>
               <input
                 id="username"
                 type="text"
                 value={username}
                 onChange={handleUsernameChange}
                 className="w-full p-2 border-gray-100 border rounded-xl"
-                placeholder="Enter your username"
+                placeholder="Entre com seu nome de usuário"
               />
               {errorUsername.error && (
                 <p className="text-red-500 text-xs mb-1 pl-2">
@@ -243,14 +243,14 @@ const Login = ({ setIsLoggedIn, setUser }) => {
                 </p>
               )}
 
-              <label htmlFor="password">Password*</label>
+              <label htmlFor="password">Senha*</label>
               <input
                 id="password"
                 type="password"
                 value={password}
                 onChange={handlePasswordChange}
                 className="w-full p-2 border-gray-100 border rounded-xl"
-                placeholder="Enter your password"
+                placeholder="Entre com sua senha"
               />
               {errorPassword.error && (
                 <p className="text-red-500 text-xs mb-1 pl-2">
@@ -264,18 +264,18 @@ const Login = ({ setIsLoggedIn, setUser }) => {
               >
                 {loading ? (
                   <>
-                    <ImSpinner6 /> &nbsp; Sending...
+                    <ImSpinner6 /> &nbsp; Enviando...
                   </>
                 ) : (
                   <>
-                    <FaUserEdit /> &nbsp; Sign in
+                    <FaUserEdit /> &nbsp; Entrar
                   </>
                 )}
               </button>
             </div>
 
             <div className="text-center m-4">
-              Don't have an account? &nbsp;
+              Novo por aqui? &nbsp;
               <button
                 onClick={() => {
                   setNewUser(true);
@@ -286,7 +286,7 @@ const Login = ({ setIsLoggedIn, setUser }) => {
                 }}
                 className="text-cyan-800 hover:underline hover:text-cyan-600 hover:cursor-pointer"
               >
-                Sign up
+                Criar Conta
               </button>
             </div>
 
@@ -306,21 +306,21 @@ const Login = ({ setIsLoggedIn, setUser }) => {
             </div>
             {/* Login title */}
             <h1 className="block text-3xl text-center font-bold text-gray-600">
-              Create Your Account?
+              Novo por aqui?
             </h1>
             <p className="text-center m-2">
-              Create an account and optimize your life.
+              Por favor, insira seus dados para criar uma nova conta.
             </p>
             {/* Login form */}
             <div className="py-4 px-8">
-              <label htmlFor="name">Full Name*</label>
+              <label htmlFor="name">Nome*</label>
               <input
                 id="name"
                 type="text"
                 value={name}
                 onChange={handleNameChange}
                 className="w-full p-2 border-gray-100 border rounded-xl"
-                placeholder="Enter your name"
+                placeholder="Insira seu nome"
               />
               {errorName.error && (
                 <p className="text-red-500 text-xs mb-1 pl-2">
@@ -328,14 +328,14 @@ const Login = ({ setIsLoggedIn, setUser }) => {
                 </p>
               )}
 
-              <label htmlFor="username">Username*</label>
+              <label htmlFor="username">Nome de usuário*</label>
               <input
                 id="username"
                 type="text"
                 value={username}
                 onChange={handleUsernameChange}
                 className="w-full p-2 border-gray-100 border rounded-xl"
-                placeholder="Enter your username"
+                placeholder="Insira seu nome de usuário"
               />
               {errorUsername.error && (
                 <p className="text-red-500 text-xs mb-1 pl-2">
@@ -343,14 +343,14 @@ const Login = ({ setIsLoggedIn, setUser }) => {
                 </p>
               )}
 
-              <label htmlFor="password">Password*</label>
+              <label htmlFor="password">Senha*</label>
               <input
                 id="password"
                 type="password"
                 value={password}
                 onChange={handlePasswordChange}
                 className="w-full p-2 border-gray-100 border rounded-xl"
-                placeholder="Enter your password"
+                placeholder="Insira sua senha"
               />
               {errorPassword.error && (
                 <p className="text-red-500 text-xs mb-1 pl-2">
@@ -364,17 +364,17 @@ const Login = ({ setIsLoggedIn, setUser }) => {
               >
                 {loading ? (
                   <>
-                    <ImSpinner6 /> &nbsp; Sending...
+                    <ImSpinner6 /> &nbsp; Enviando...
                   </>
                 ) : (
                   <>
-                    <FaUserEdit /> &nbsp; Sign up
+                    <FaUserEdit /> &nbsp; Criar Conta
                   </>
                 )}
               </button>
             </div>
             <div className="text-center m-4">
-              Already have an account? &nbsp;
+              Ja possui uma conta? &nbsp;
               <button
                 onClick={() => {
                   setNewUser(false);
@@ -385,7 +385,7 @@ const Login = ({ setIsLoggedIn, setUser }) => {
                 }}
                 className="text-cyan-800 hover:underline hover:text-cyan-600 hover:cursor-pointer"
               >
-                Sign in
+                Entrar
               </button>
             </div>
             <div className="bg-cyan-800 h-5"></div>

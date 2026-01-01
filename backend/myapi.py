@@ -54,9 +54,10 @@ class TaskSchema(BaseModel):
     title: str
     description: str
     priority: int
-    date: str
+    pin: bool
     done: bool
     username: str
+    date: str
 
 # Tabela de to-dos
 class Task(Base):
@@ -66,30 +67,55 @@ class Task(Base):
     title = Column("title", String)
     description = Column("description", String)
     priority = Column("priority", Integer)
+    pin = Column("pin", Boolean)
     done = Column("done", Boolean)
-    date = Column("date", String)
     username = Column("username", ForeignKey("users.username"))
+    date = Column("date", String)
 
-    def __init__(self, title, description, username, priority=0, date=datetime.isoformat(datetime.now(), timespec="seconds"), done=False):
+    def __init__(self, title, description, username, priority=0, date=datetime.isoformat(datetime.now(), timespec="seconds"), pin=False, done=False):
         self.title = title
         self.description = description
         self.priority = priority
-        self.date = date
+        self.pin = pin
         self.done = done
         self.username = username
+        self.date = date
         
 
 # Cria as tabelas
 Base.metadata.create_all(bind=db)
 
+#
 # DEV: Mostra todos os registros do DB
-@app.get("/{username}")
+@app.get("/")
 async def root(username: str):
     """Listagem de todas as tasks do usuário."""
-    task = session.query(Task).filter(Task.username == username).all()
+    task = session.query(Task).all()
     return task
 
 
+#
+# Login de um usuário
+@app.post("/users/login")
+async def login_user(user: LoginSchema):
+    """Login de um usuário."""
+    hashed_password = hashlib.sha256(user.password.encode()).hexdigest()
+    existing_user = session.query(User).filter_by(username=user.username, password=hashed_password).first()
+    if (existing_user):
+        return {
+                "success": True,
+                "message": "User logged in",
+                "name": existing_user.name,
+                "username": existing_user.username
+            }
+    else:
+        return {
+                "success": False,
+                "message": "User not found",
+            }
+
+
+#
 # Cria um novo usuário
 @app.post("/users/create")
 async def create_user(user: UserSchema):
@@ -121,12 +147,42 @@ async def create_user(user: UserSchema):
     finally:
         session.close()
 
+#
+# Retorna todas as tasks de um usuário
+@app.get("/tasks/{username}")
+async def get_tasks(username: str):
+    """Listagem de todas as tasks do usuário."""
+    tasks = session.query(Task).filter(Task.username == username).order_by(Task.date).all()
 
+    if not tasks:
+        return {
+            "success": False,
+            "message": "Message not found"
+        }
+
+    tasks_list = [
+        {
+            "id": task.id,
+            "title": task.title,
+            "description": task.description,
+            "priority": task.priority,
+            "pin": task.pin,
+            "done": task.done,
+            "date": task.date
+        }
+        for task in tasks
+    ]
+
+    return tasks_list
+
+
+#
+# Cria uma nova task
 @app.post("/tasks/create")
 async def create_task(task: TaskSchema):
     """Cria uma nova task."""
     try:
-        new_task = Task(title=task.title, description=task.description, priority=task.priority, done=task.done, date=task.date, username=task.username)
+        new_task = Task(title=task.title, description=task.description, priority=task.priority, pin=task.pin, done=task.done, date=task.date, username=task.username)
         session.add(new_task)
         session.commit()
         return {
@@ -136,6 +192,7 @@ async def create_task(task: TaskSchema):
             "title": new_task.title,
             "description": new_task.description,
             "priority": new_task.priority,
+            "pin": new_task.pin,
             "date": new_task.date,
             "done": new_task.done,
             "username": new_task.username
@@ -160,20 +217,3 @@ async def create_task(task: TaskSchema):
 #     return {"message": "User updated"}
 
 
-@app.post("/users/login")
-async def login_user(user: LoginSchema):
-    """Login de um usuário."""
-    hashed_password = hashlib.sha256(user.password.encode()).hexdigest()
-    existing_user = session.query(User).filter_by(username=user.username, password=hashed_password).first()
-    if (existing_user):
-        return {
-                "success": True,
-                "message": "User logged in",
-                "name": existing_user.name,
-                "username": existing_user.username
-            }
-    else:
-        return {
-                "success": False,
-                "message": "User not found",
-            }

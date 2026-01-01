@@ -5,11 +5,18 @@ import Schedule from "./components/Schedule/Schedule";
 import SideBar from "./components/Sidebar/Sidebar";
 
 import DateProvider from "./context/DateContext.jsx";
+import TasksProvider from "./context/TasksContext.jsx";
 
+//
+// Descontinuando
 import api from "./api.js";
+//
 
 function App() {
+  //
+  // Desacoplando
   const [todos, setTodos] = useState([]);
+  //
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -28,9 +35,12 @@ function App() {
     }
   }, []);
 
+  //
+  // Descontinuando
   useEffect(() => {
     setTodos(api("/todos"));
   }, []);
+  //
 
   return (
     <>
@@ -41,9 +51,10 @@ function App() {
         ) : (
           <>
             <DateProvider>
-              <SideBar user={user} />
-
-              <Schedule todos={todos} setTodos={setTodos} />
+              <TasksProvider>
+                <SideBar user={user} />
+                <Schedule todos={todos} setTodos={setTodos} user={user} />
+              </TasksProvider>
             </DateProvider>
           </>
         )}

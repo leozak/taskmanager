@@ -2,7 +2,7 @@ import NavBar from "./NavBar";
 import ScheduleView from "./ScheduleView";
 import AddNewTask from "./AddNewTask";
 
-const Schedule = ({ todos, setTodos }) => {
+const Schedule = ({ todos, setTodos, user }) => {
   return (
     <div className="relative p-2 w-full bg-neutral-200">
       <NavBar />
@@ -11,7 +11,7 @@ const Schedule = ({ todos, setTodos }) => {
 
       <ScheduleView todos={todos} />
 
-      <AddNewTask />
+      <AddNewTask user={user} />
     </div>
   );
 };

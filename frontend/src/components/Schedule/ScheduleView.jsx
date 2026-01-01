@@ -2,8 +2,13 @@ import { useContext } from "react";
 
 import { DateContext } from "../../context/DateContext";
 
+import { TasksContext } from "../../context/TasksContext";
+
 const ScheduleView = ({ todos }) => {
   const { year, month, day } = useContext(DateContext);
+  const { tasks } = useContext(TasksContext);
+
+  console.log(tasks);
 
   return (
     <div>

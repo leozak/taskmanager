@@ -5,9 +5,9 @@ import { toast } from "react-toastify";
 import Modal from "../Modal/Modal";
 import TaskEdit from "./TaskEdit";
 
-import { DateContext } from "../../context/DateContext";
+const url_base = "http://127.0.0.1:8000";
 
-const AddNewTask = () => {
+const AddNewTask = ({ user }) => {
   const [openForm, setOpenForm] = useState(false);
 
   const [task, setTask] = useState({
@@ -23,16 +23,37 @@ const AddNewTask = () => {
   /*
    * Salva uma nova tarefa
    */
-  const handleSaveNewTask = () => {
-    //
-    // - Verifica se o título da tarefa foi preenchido
-    // - Envia a tarefa para o backend
-    // - Fecha o modal
-    //
-    console.log(task);
-    console.log(task.title);
+  const handleSaveNewTask = async () => {
     if (task.title === "") {
       toast.error("Entre com um título.");
+    } else {
+      const response = await fetch(url_base + "/tasks/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: task.id,
+          title: task.title,
+          description: task.description,
+          priority: task.priority,
+          pin: task.pin,
+          done: task.done,
+          username: user.username,
+          date: task.date,
+        }),
+      }).catch((error) => {
+        console.log(error);
+        toast.error("Erro ao criar tarefa.");
+      });
+
+      if (response.status === 200) {
+        toast.success("Tarefa criada com sucesso.");
+        setOpenForm(false);
+      } else {
+        console.log(response.statusText);
+        toast.error("Erro ao criar tarefa.");
+      }
     }
   };
 
