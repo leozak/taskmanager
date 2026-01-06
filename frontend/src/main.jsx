@@ -9,7 +9,11 @@ createRoot(document.getElementById("root")).render(
   <>
     {/* <StrictMode> */}
     <App />
-    <ToastContainer className="mt-20" autoClose="3000" />
+    <ToastContainer
+      className="mt-20"
+      autoClose="2000"
+      position="bottom-center"
+    />
     {/* </StrictMode> */}
   </>
 );

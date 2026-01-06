@@ -206,14 +206,59 @@ async def create_task(task: TaskSchema):
     finally:
         session.close()
 
+#
+# Schema para mudar o status de conclusão
+class TaskDoneSchema(BaseModel):
+    done: bool
 
-# @app.post("/users/update")
-# async def update_user(username: str, name: str, password: str):
-#     """Atualiza um usuário."""
-#     user = session.query(User).filter(User.username == username).first()
-#     user.name = name
-#     user.password = password
-#     session.commit()
-#     return {"message": "User updated"}
+#
+# Muda o status de conclusão
+@app.patch("/tasks/done/{id}")
+async def done_task(id: int, task: TaskDoneSchema):
+    """Muda o status de conclusão de uma task."""
+    try:
+        session.query(Task).filter(Task.id == id).update({"done": task.done})
+        session.commit()
+        return {
+            "success": True,
+            "message": "Task done updated",
+            "id": id,
+            "done": task.done,
+        }
+    except Exception as e:
+        session.rollback()
+        return {
+            "success": False,
+            "message": "Error updating done"
+        }
+    finally:
+        session.close()
 
 
+#
+# Schema para fixar ou desafixar uma tarefa
+class TaskPinSchema(BaseModel):
+    pin: bool
+
+#
+# Fixa ou desafixa uma tarefa
+@app.patch("/tasks/pin/{id}")
+async def pin_task(id: int, task: TaskPinSchema):
+    """Fixa ou desafixa uma tarefa."""
+    try:
+        session.query(Task).filter(Task.id == id).update({"pin": task.pin})
+        session.commit()
+        return {
+            "success": True,
+            "message": "Task pin updated",
+            "id": id,
+            "done": task.pin,
+        }
+    except Exception as e:
+        session.rollback()
+        return {
+            "success": False,
+            "message": "Error updating pin"
+        }
+    finally:
+        session.close()

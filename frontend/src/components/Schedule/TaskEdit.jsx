@@ -93,9 +93,9 @@ const TaskEdit = ({ task, setTask }) => {
             onChange={(e) => setPriority(e.target.value)}
             className="w-full bg-gray-300 text-gray-900 mt-1 p-2 rounded-lg hover:cursor-pointer focus:outline-none focus:shadow-outline"
           >
-            <option value="0">Obrigatória</option>
-            <option value="1">Opcional</option>
-            <option value="2">Talvez</option>
+            <option value="0">Urgente</option>
+            <option value="1">Importante</option>
+            <option value="2">Normal</option>
           </select>
         </div>
 

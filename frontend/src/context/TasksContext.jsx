@@ -9,10 +9,12 @@ const url_base = "http://localhost:8000";
 
 const username = sessionStorage.getItem("username");
 
+let data = [];
+
 const TasksProvider = ({ children }) => {
   const [tasks, setTasks] = useState([]);
-  const [tasksRefresh, setTasksRefresh] = useState(false);
-  const [data, setData] = useState([]);
+  const [_search, _setSearch] = useState("");
+  const [dailyTasks, setDailyTasks] = useState([]);
 
   const { year, month, day } = useContext(DateContext);
   const date =
@@ -35,8 +37,11 @@ const TasksProvider = ({ children }) => {
       toast.error("Erro ao carregar tarefas.");
     });
 
-    const _data = await response.json();
-    setData(_data);
+    data = await response.json();
+
+    data = await data.sort((a, b) => {
+      return a.done - b.done || b.pin - a.pin;
+    });
 
     if (response.status === 200) {
       setTasks(data);
@@ -53,39 +58,48 @@ const TasksProvider = ({ children }) => {
     loadingTasks()
       // Filtra as tarefas por data
       .finally(() => {
-        //
-        //
-        // - Verificar se o filtro de data está ligado
-        //
-        //
         filterDateTasks(date);
+        filterSearch(_search);
       });
+  };
+
+  //
+  // Realiza uma pesquisa
+  const search = (_search) => {
+    _setSearch(_search);
+    filterSearch(_search);
   };
 
   //
   // Filtra as tarefas por data
   const filterDateTasks = (_date) => {
-    console.log(data);
-    if (data) {
-      const _tasks = data.filter((task) => {
-        return task.date === _date;
-      });
-      setTasks(_tasks);
-    }
+    const _tasks = data.filter((task) => {
+      return task.date === _date;
+    });
+    setTasks(_tasks);
+    setDailyTasks(_tasks);
+  };
+
+  //
+  // Filtra as tarefas por pesquisa
+  const filterSearch = (_search) => {
+    const _tasks = dailyTasks.filter((task) => {
+      if (_search === "") return true;
+      return (
+        task.title.toLowerCase().includes(_search.toLowerCase()) ||
+        task.description.toLowerCase().includes(_search.toLowerCase())
+      );
+    });
+    setTasks(_tasks);
   };
 
   //
   // Verifica se tem tarefas em uma data especifica
   const hasTasks = (_date) => {
-    console.log(data);
-    if (data) {
-      const _tasks = data.filter((task) => {
-        return task.date === _date;
-      });
-      return _tasks.length > 0;
-    } else {
-      return false;
-    }
+    const _tasks = data.filter((task) => {
+      return task.date === _date;
+    });
+    return _tasks.length > 0;
   };
 
   //
@@ -104,7 +118,7 @@ const TasksProvider = ({ children }) => {
   }, [year, month, day]);
 
   return (
-    <TasksContext.Provider value={{ tasks, refresh, hasTasks }}>
+    <TasksContext.Provider value={{ tasks, refresh, hasTasks, search }}>
       {children}
     </TasksContext.Provider>
   );

@@ -25,21 +25,21 @@ const ScheduleView = ({ todos }) => {
       {tasks.length > 0 ? (
         <>
           {tasksZero.length > 0 && (
-            <div className="border-r w-1/3">
+            <div className="w-1/3">
               {tasksZero.map((task) => (
                 <TaskCard task={task} key={task.id} />
               ))}
             </div>
           )}
           {tasksOne.length > 0 && (
-            <div className="border-r w-1/3">
+            <div className="w-1/3">
               {tasksOne.map((task) => (
                 <TaskCard task={task} key={task.id} />
               ))}
             </div>
           )}
           {tasksTwo.length > 0 && (
-            <div className="border-r w-1/3">
+            <div className="w-1/3">
               {tasksTwo.map((task) => (
                 <TaskCard task={task} key={task.id} />
               ))}
