@@ -49,7 +49,6 @@ const TasksProvider = ({ children }) => {
   //
   // Recarrega as tarefas
   const refresh = () => {
-    toast.warning("Tarefas recarregadas.");
     // Carrega as tarefas
     loadingTasks()
       // Filtra as tarefas por data
@@ -67,10 +66,18 @@ const TasksProvider = ({ children }) => {
   // Filtra as tarefas por data
   const filterDateTasks = (_date) => {
     const _tasks = data.filter((task) => {
-      console.log(task.date, _date, task.date === _date);
       return task.date === _date;
     });
     setTasks(_tasks);
+  };
+
+  //
+  // Verifica se tem tarefas em uma data especifica
+  const hasTasks = (_date) => {
+    const _tasks = data.filter((task) => {
+      return task.date === _date;
+    });
+    return _tasks.length > 0;
   };
 
   //
@@ -79,7 +86,7 @@ const TasksProvider = ({ children }) => {
     // Carrega as tarefas
     loadingTasks()
       // Filtra as tarefas por data
-      .finally(() => filterDateTasks(date));
+      .then(() => filterDateTasks(date));
   }, []);
 
   //
@@ -89,7 +96,7 @@ const TasksProvider = ({ children }) => {
   }, [year, month, day]);
 
   return (
-    <TasksContext.Provider value={{ tasks, setTasks, refresh }}>
+    <TasksContext.Provider value={{ tasks, refresh, hasTasks }}>
       {children}
     </TasksContext.Provider>
   );

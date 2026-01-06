@@ -3,6 +3,7 @@ import { FaCalendarAlt, FaUserCog } from "react-icons/fa";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
 
 import { DateContext } from "../../context/DateContext";
+import { TasksContext } from "../../context/TasksContext";
 
 const months = [
   "January",
@@ -25,6 +26,8 @@ const SidebarCallendar = () => {
   const { year, setYear, month, setMonth, day, setDay } =
     useContext(DateContext);
 
+  const { hasTasks } = useContext(TasksContext);
+
   const getDaysInMonth = (month, year) => {
     return new Date(year, month + 1, 0).getDate();
   };
@@ -38,6 +41,15 @@ const SidebarCallendar = () => {
 
   const daysClear = Array.from({ length: firstDayOfWeek });
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  const daysHasTasks = Array.from({ length: daysInMonth }, (_, i) => {
+    return hasTasks(
+      year +
+        "-" +
+        (month < 9 ? "0" + (month + 1) : month + 1) +
+        "-" +
+        (i + 1 < 10 ? "0" + (i + 1) : i + 1)
+    );
+  });
 
   return (
     <>
@@ -80,9 +92,9 @@ const SidebarCallendar = () => {
         </div>
 
         {/* Calendar Days */}
-        <div className="text-xs text-gray-300 grid grid-cols-7 text-center">
+        <div className="text-xs text-gray-400 grid grid-cols-7 text-center">
           {week.map((nameDay) => (
-            <div key={nameDay} className="font-bold py-1">
+            <div key={nameDay} className="font-bold text-gray-300 py-1">
               {nameDay}
             </div>
           ))}
@@ -95,9 +107,12 @@ const SidebarCallendar = () => {
             <div
               key={_day}
               onClick={() => setDay(_day)}
-              className={`${
-                day === _day ? "bg-cyan-900" : ""
-              } rounded-sm hover:bg-cyan-800 hover:cursor-pointer hover:text-gray-200 py-1`}
+              className={`${day === _day ? "bg-cyan-900" : ""}
+              ${
+                daysHasTasks[_day - 1]
+                  ? "underline font-bold text-gray-200"
+                  : "font-normal"
+              } rounded-sm hover:bg-cyan-800 hover:cursor-pointer hover:text-gray-100 py-1`}
             >
               {_day}
             </div>
