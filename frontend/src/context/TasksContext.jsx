@@ -9,11 +9,10 @@ const url_base = "http://localhost:8000";
 
 const username = sessionStorage.getItem("username");
 
-let data = [];
-
 const TasksProvider = ({ children }) => {
   const [tasks, setTasks] = useState([]);
   const [tasksRefresh, setTasksRefresh] = useState(false);
+  const [data, setData] = useState([]);
 
   const { year, month, day } = useContext(DateContext);
   const date =
@@ -36,7 +35,8 @@ const TasksProvider = ({ children }) => {
       toast.error("Erro ao carregar tarefas.");
     });
 
-    data = await response.json();
+    const _data = await response.json();
+    setData(_data);
 
     if (response.status === 200) {
       setTasks(data);
@@ -65,19 +65,27 @@ const TasksProvider = ({ children }) => {
   //
   // Filtra as tarefas por data
   const filterDateTasks = (_date) => {
-    const _tasks = data.filter((task) => {
-      return task.date === _date;
-    });
-    setTasks(_tasks);
+    console.log(data);
+    if (data) {
+      const _tasks = data.filter((task) => {
+        return task.date === _date;
+      });
+      setTasks(_tasks);
+    }
   };
 
   //
   // Verifica se tem tarefas em uma data especifica
   const hasTasks = (_date) => {
-    const _tasks = data.filter((task) => {
-      return task.date === _date;
-    });
-    return _tasks.length > 0;
+    console.log(data);
+    if (data) {
+      const _tasks = data.filter((task) => {
+        return task.date === _date;
+      });
+      return _tasks.length > 0;
+    } else {
+      return false;
+    }
   };
 
   //

@@ -20,7 +20,7 @@ const TaskCard = ({ task }) => {
         ${task.priority === 2 ? "bg-gray-500" : ""}
         w-2`}
         ></div>
-        <div>
+        <div className="flex-col">
           <div className="py-2 px-2">{task.title}</div>
           <div className="text-xs text-gray-400">
             <AiFillCaretDown />
