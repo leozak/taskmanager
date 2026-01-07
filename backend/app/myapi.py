@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 from pydantic import BaseModel
 
 # Configura o FastAPI
-app = FastAPI(title="To-do List Schedule", version="0.1")
+app = FastAPI(title="Trask Manager API", version="0.1")
 
 origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
 
@@ -20,7 +20,7 @@ app.add_middleware(
     )
 
 # SQLAlchemy
-db = create_engine("sqlite:///to-do-list.db")
+db = create_engine("sqlite:///tasks.db")
 Session = sessionmaker(bind=db)
 session = Session()
 
