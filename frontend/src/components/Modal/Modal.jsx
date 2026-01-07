@@ -15,11 +15,11 @@ const Modal = ({ title, callbackClose, children }) => {
   return (
     <>
       <div
-        className={`fixed flex inset-0 justify-center items-center opacity-90 transition-colors
+        className={`fixed flex inset-0 z-10 justify-center items-center opacity-90 transition-colors
             ${openForm ? "bg-black/90 visible" : "bg-black/0 invisible"}
             `}
       ></div>
-      <div className="fixed flex inset-0 justify-center items-center">
+      <div className="fixed flex inset-0 z-20 justify-center items-center">
         {/* MODAL TASK */}
         <div
           onClick={(e) => e.stopPropagation()}

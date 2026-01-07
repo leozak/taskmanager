@@ -1,10 +1,15 @@
 import { useState, useContext } from "react";
 
+import { FaEdit } from "react-icons/fa";
+import { MdEditSquare } from "react-icons/md";
+
+import { BsTrash3Fill } from "react-icons/bs";
+
 import { TasksContext } from "../../context/TasksContext";
 
 const url_base = "http://127.0.0.1:8000";
 
-const TaskCardDetails = ({ task, showDetails }) => {
+const TaskCardDetails = ({ task, showDetails, editTask }) => {
   const [done, setDone] = useState(task.done);
 
   const { refresh } = useContext(TasksContext);
@@ -36,29 +41,47 @@ const TaskCardDetails = ({ task, showDetails }) => {
     >
       <div className="my-2 mb-4">{task.description}</div>
 
-      <div className="my-2">
-        <strong>Data:</strong>&nbsp;{task.date}
-      </div>
+      <div className="flex flex-row justify-between">
+        <div>
+          <div className="my-2">
+            <strong>Data:</strong>&nbsp;{task.date}
+          </div>
 
-      <div className="my-1">
-        <label
-          htmlFor={`done-${task.id}`}
-          className="text-sm text-gray-600 font-bold flex items-center hover:cursor-pointer"
-        >
-          <input
-            id={`done-${task.id}`}
-            name="done"
-            type="checkbox"
-            checked={done}
-            onChange={handleDoneChange}
-            className="accent-cyan-600 w-4 h-4 mr-3 hover:cursor-pointer"
-          />
-          Concluida
-        </label>
-      </div>
+          <div className="my-1">
+            <label
+              htmlFor={`done-${task.id}`}
+              className="text-sm text-gray-600 font-bold flex items-center hover:cursor-pointer"
+            >
+              <input
+                id={`done-${task.id}`}
+                name="done"
+                type="checkbox"
+                checked={done}
+                onChange={handleDoneChange}
+                className="accent-cyan-600 w-4 h-4 mr-3 hover:cursor-pointer"
+              />
+              Concluida
+            </label>
+          </div>
+        </div>
 
-      <div>{task.pin}</div>
-      <div>{task.done}</div>
+        {/* Opções */}
+        <div className="flex flex-row gap-x-2">
+          <button
+            title="Editar"
+            onClick={editTask}
+            className="flex items-center p-1 gap-x-2 mt-1 hover:text-gray-400 hover:cursor-pointer"
+          >
+            <MdEditSquare className="w-8 h-8" />
+          </button>
+          <button
+            title="Excluir"
+            className="flex items-center p-1 gap-x-2 hover:text-gray-400 hover:cursor-pointer"
+          >
+            <BsTrash3Fill className="w-7 h-7" />
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

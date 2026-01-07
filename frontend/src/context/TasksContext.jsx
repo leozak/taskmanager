@@ -57,10 +57,9 @@ const TasksProvider = ({ children }) => {
     // Carrega as tarefas
     loadingTasks()
       // Filtra as tarefas por data
-      .finally(() => {
-        filterDateTasks(date);
-        filterSearch(_search);
-      });
+      .then(() => filterDateTasks(date))
+      // Filtra as tarefas por pesquisa
+      .then(() => filterSearch(_search));
   };
 
   //
@@ -73,11 +72,14 @@ const TasksProvider = ({ children }) => {
   //
   // Filtra as tarefas por data
   const filterDateTasks = (_date) => {
-    const _tasks = data.filter((task) => {
-      return task.date === _date;
+    return new Promise((resolve) => {
+      const _tasks = data.filter((task) => {
+        return task.date === _date;
+      });
+      setTasks(_tasks);
+      setDailyTasks(_tasks);
+      resolve();
     });
-    setTasks(_tasks);
-    setDailyTasks(_tasks);
   };
 
   //

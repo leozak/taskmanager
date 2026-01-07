@@ -21,25 +21,25 @@ const ScheduleView = ({ todos }) => {
   }, [tasks]);
 
   return (
-    <div className="p-4 flex">
+    <div className="p-4 flex flex-wrap flex-col lg:flex-row">
       {tasks.length > 0 ? (
         <>
           {tasksZero.length > 0 && (
-            <div className="w-1/3">
+            <div className="lg:w-1/3 w-full">
               {tasksZero.map((task) => (
                 <TaskCard task={task} key={task.id} />
               ))}
             </div>
           )}
           {tasksOne.length > 0 && (
-            <div className="w-1/3">
+            <div className="lg:w-1/3 w-full">
               {tasksOne.map((task) => (
                 <TaskCard task={task} key={task.id} />
               ))}
             </div>
           )}
           {tasksTwo.length > 0 && (
-            <div className="w-1/3">
+            <div className="lg:w-1/3 w-full">
               {tasksTwo.map((task) => (
                 <TaskCard task={task} key={task.id} />
               ))}
@@ -51,15 +51,6 @@ const ScheduleView = ({ todos }) => {
           Nenhuma tarefa encontrada.
         </p>
       )}
-      {/* <div className="inline-block">
-        {tasks.length > 0 ? (
-          tasks.map((task) => <TaskCard task={task} />)
-        ) : (
-          <p className="text-gray-500 text-xl mt-2 ml-2">
-            Nenhuma tarefa encontrada.
-          </p>
-        )}
-      </div> */}
     </div>
   );
 };

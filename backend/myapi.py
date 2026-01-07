@@ -206,6 +206,53 @@ async def create_task(task: TaskSchema):
     finally:
         session.close()
 
+
+#
+# Schema para alterar uma task
+class TaskUpdateSchema(BaseModel):
+    title: str
+    description: str
+    priority: int
+    pin: bool
+    done: bool
+    date: str
+
+#
+# Altera uma task
+@app.put("/tasks/update/{id}")
+async def update_task(id: int, task: TaskUpdateSchema):
+    """Altera uma task."""
+    try:
+        session.query(Task).filter(Task.id == id).update({
+            "title": task.title,
+            "description": task.description,
+            "priority": task.priority,
+            "pin": task.pin,
+            "done": task.done,
+            "date": task.date
+        })
+        session.commit()
+        return {
+            "success": True,
+            "message": "Task updated",
+            "id": id,
+            "title": task.title,
+            "description": task.description,
+            "priority": task.priority,
+            "pin": task.pin,
+            "done": task.done,
+            "date": task.date
+        }
+    except Exception as e:
+        session.rollback()
+        return {
+            "success": False,
+            "message": "Error updating task"
+        }
+    finally:
+        session.close()
+
+
 #
 # Schema para mudar o status de conclusão
 class TaskDoneSchema(BaseModel):
