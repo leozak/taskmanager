@@ -29,8 +29,8 @@ app.add_middleware(
 
 # SQLAlchemy
 # db = create_engine("sqlite:///tasks.db")
-db = create_engine(DATABASE_URL)
-Session = sessionmaker(bind=db)
+engine = create_engine(DATABASE_URL)
+Session = sessionmaker(bind=engine)
 session = Session()
 
 Base = declarative_base()
@@ -92,7 +92,20 @@ class Task(Base):
         
 
 # Cria as tabelas
-Base.metadata.create_all(bind=db)
+Base.metadata.create_all(bind=engine)
+
+#
+# Dependency que retorna a sessão de banco de dados
+def get_db():
+    """
+    Gera uma nova sessão de banco de dados.
+    """
+    db = Session()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 #
 # DEV: Mostra todos os registros do DB
