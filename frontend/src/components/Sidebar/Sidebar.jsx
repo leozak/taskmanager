@@ -26,6 +26,19 @@ const Sidebar = ({ user }) => {
 
       {/* USER MENU */}
       <SidebarUserMenu user={user} />
+
+      {/* SAIR */}
+      <div className="absolute bottom-6 right-4">
+        <button
+          onClick={() => {
+            sessionStorage.removeItem("loggedIn");
+            window.location.href = "/";
+          }}
+          className="text-gray-400 text-sm font-semibold hover:text-gray-300 hover:cursor-pointer"
+        >
+          Sair
+        </button>
+      </div>
     </div>
   );
 };

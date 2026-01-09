@@ -81,8 +81,19 @@ async def create_user(user: UserCreateSchema, db: Session = Depends(get_db)):
             }
         else:
             hashed_password = hashlib.sha256(user.password.encode()).hexdigest()
-            new_user = User(name=user.name, username=user.username, password=hashed_password)
+            new_user = User(name=  user.name, username=user.username, password=hashed_password)
+            
+            add_first_task = Task(title="Resolva o que é crítico agora", description="A prioridade Urgente deve ser usada para tarefas que exigem atenção imediata, como prazos que vencem hoje ou problemas que impedem seu progresso. Se não pode esperar, é urgente.", priority=0, pin=True, done=False, username=user.username, date="2026-01-09")
+            add_secound_task = Task(title="Organize suas metas principais", description="A prioridade Importante é para atividades que trazem valor real ao seu projeto. Use para tarefas que têm prazo definido, mas não são emergências. A maior parte do seu trabalho deve estar aqui.", priority=1, pin=True, done=False, username=user.username, date="2026-01-09")
+            add_tird_task = Task(title="Ideias para quando sobrar tempo", description="A prioridade Opcional serve para ideias, melhorias desejáveis (nice-to-have) ou tarefas sem prazo. São coisas que você gostaria de fazer, mas não afetarão seu projeto se ficarem para depois.", priority=2, pin=True, done=False, username=user.username, date="2026-01-09")
+
             db.add(new_user)
+            db.commit()
+            db.add(add_first_task)
+            db.add(add_secound_task)
+            db.add(add_tird_task)
+            db.commit()
+            
             db.commit()
             return {
                 "success": True,

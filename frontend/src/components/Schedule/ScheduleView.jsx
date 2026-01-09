@@ -4,7 +4,7 @@ import { TasksContext } from "../../context/TasksContext";
 import TaskCard from "./TaskCard";
 
 const ScheduleView = () => {
-  const { tasks } = useContext(TasksContext);
+  const { tasks, refresh } = useContext(TasksContext);
   const [tasksZero, setTasksZero] = useState([]);
   const [tasksOne, setTasksOne] = useState([]);
   const [tasksTwo, setTasksTwo] = useState([]);
