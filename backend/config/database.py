@@ -8,6 +8,10 @@ DATABASE_URL = os.getenv(
     "sqlite:///./taskmanager.db", # SQLite para desenvolvimento
 )
 
+# Render usa 'postgres://', SQLAlchemy precisa de 'postgresql://'
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
 # Configuração do engine
 if DATABASE_URL.startswith("sqlite"):
     engine = create_engine(

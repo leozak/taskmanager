@@ -10,12 +10,10 @@ from config.database import Base, engine, get_db
 from models.user import User
 from models.task import Task
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://postgres:postgres@db:5432/taskmanager",
-)
+CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:5173")
 
-ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:5173")
+origins = [origins.strip() for origins in CORS_ORIGINS.split(",")]
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -24,7 +22,7 @@ app = FastAPI(title="Trask Manager API", version="0.3")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ORIGINS,
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
