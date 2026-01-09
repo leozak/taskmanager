@@ -1,5 +1,6 @@
 import os
 import hashlib
+from dotenv import load_dotenv
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -9,6 +10,8 @@ from config.database import Base, engine, get_db
 
 from models.user import User
 from models.task import Task
+
+load_dotenv()
 
 CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:5173")
 

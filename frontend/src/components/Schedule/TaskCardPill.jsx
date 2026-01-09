@@ -5,7 +5,7 @@ import { RiUnpinLine, RiPushpinFill } from "react-icons/ri";
 
 import { TasksContext } from "../../context/TasksContext";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+import { API_URL } from "../../config";
 
 const TaskCardPill = ({ task, showDetails, setShowDetails }) => {
   const [pin, setPin] = useState(task.pin);

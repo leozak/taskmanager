@@ -4,7 +4,7 @@ import { PiUserCirclePlusFill } from "react-icons/pi";
 import { FaUserEdit } from "react-icons/fa";
 import { ImSpinner6 } from "react-icons/im";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+import { API_URL } from "../../config";
 
 const Login = ({ setIsLoggedIn, setUser }) => {
   const [name, setName] = useState("");

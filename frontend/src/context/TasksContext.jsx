@@ -5,7 +5,7 @@ import { DateContext } from "./DateContext";
 
 export const TasksContext = createContext();
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+import { API_URL } from "../config";
 
 const username = sessionStorage.getItem("username");
 
@@ -107,9 +107,7 @@ const TasksProvider = ({ children }) => {
   // Montagem do componente
   useEffect(() => {
     // Carrega as tarefas
-    loadingTasks()
-      // Filtra as tarefas por data
-      .then(() => filterDateTasks(date));
+    loadingTasks();
   }, []);
 
   //
