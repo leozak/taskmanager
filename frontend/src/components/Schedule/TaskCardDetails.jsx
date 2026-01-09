@@ -7,7 +7,7 @@ import { BsTrash3Fill } from "react-icons/bs";
 
 import { TasksContext } from "../../context/TasksContext";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+import { API_URL } from "../../config";
 
 const TaskCardDetails = ({ task, showDetails, editTask }) => {
   const [done, setDone] = useState(task.done);
