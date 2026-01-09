@@ -1,11 +1,15 @@
+import sys
 import pytest
+from pathlib import Path
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from backend.main import app
-from backend.config.database import Base, get_db
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from main import app
+from config.database import Base, get_db
 
 # Banco de dados em memória para testes
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
@@ -49,10 +53,14 @@ def client(db_session):
 
 
 @pytest.fixture
-def tarefa_exemplo():
+def example_task():
     """Dados de exemplo para testes."""
     return {
-        "titulo": "Tarefa de Teste",
-        "descricao": "Descrição da tarefa",
-        "done": False
+        "title": "Tarefa de Teste",
+        "description": "Descrição da tarefa",
+        "priority": 0,
+        "pin": False,
+        "done": False,
+        "username": "testuser",
+        "date": "2026-01-08"
     }

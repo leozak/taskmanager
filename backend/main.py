@@ -5,10 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
-from backend.config.database import Base, engine, get_db
+from config.database import Base, engine, get_db
 
-from backend.models.user import User
-from backend.models.task import Task
+from models.user import User
+from models.task import Task
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
@@ -34,7 +34,7 @@ app.add_middleware(
 #
 # DEV: Mostra todos os registros do DB
 @app.get("/")
-async def root(username: str, db: Session = Depends(get_db)):
+async def root(db: Session = Depends(get_db)):
     """Status da API."""
     return {"status": "online", "message": "API de Tarefas"}
 
@@ -71,7 +71,7 @@ class UserCreateSchema(BaseModel):
     username: str
     password: str
 
-@app.post("/users/create")
+@app.post("/users/create", status_code=201)
 async def create_user(user: UserCreateSchema, db: Session = Depends(get_db)):
     """Creates a new user."""
     try:
@@ -111,7 +111,8 @@ async def get_tasks(username: str, db: Session = Depends(get_db)):
     if not tasks:
         return {
             "success": False,
-            "message": "Message not found"
+            "message": "Message not found",
+            "tasks": []
         }
 
     tasks_list = [
@@ -133,7 +134,6 @@ async def get_tasks(username: str, db: Session = Depends(get_db)):
 #
 # Cria uma nova task
 class TaskCreateSchema(BaseModel):
-    id: int
     title: str
     description: str
     priority: int
@@ -142,12 +142,11 @@ class TaskCreateSchema(BaseModel):
     username: str
     date: str
 
-@app.post("/tasks/create")
+@app.post("/tasks/create", status_code=201)
 async def create_task(task: TaskCreateSchema, db: Session = Depends(get_db)):
     """Cria uma nova task."""
     try:
         new_task = Task(title=task.title, description=task.description, priority=task.priority, pin=task.pin, done=task.done, date=task.date, username=task.username)
-        # new_task = Task(**task.model_dump())
         db.add(new_task)
         db.commit()
         return {
