@@ -9,7 +9,7 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/taskmanager
-      - SECRET_KEY=developer-key
+      - SECRET_KEY=482745d633a5fbffd42396f942467debe815dee0
       - CORS_ORIGINS=http://localhost:5173
       - ENVIRONMENT=development
       - DEBUG=True

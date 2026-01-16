@@ -1,10 +1,14 @@
 import os
 import hashlib
 from dotenv import load_dotenv
-from fastapi import FastAPI, Depends
+from datetime import datetime, timedelta, timezone
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from jose import jwt, JWTError
 from pydantic import BaseModel
+from typing import Union
 
 from config.database import Base, engine, get_db
 
@@ -14,9 +18,13 @@ from models.task import Task
 load_dotenv()
 
 CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:5173")
+SECRET_KEY = os.getenv("SECRET_KEY", "79a9ebd164d2d36fab50c5bd4b2828b4e1325ec0c6b9c6d1c2b2c3b2c4b2c5b2")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login-form")
 
 origins = [origins.strip() for origins in CORS_ORIGINS.split(",")]
-
 
 Base.metadata.create_all(bind=engine)
 
@@ -33,7 +41,40 @@ app.add_middleware(
 
 
 #
-# DEV: Mostra todos os registros do DB
+# Cria um novo token
+def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
+    """Cria um novo token."""
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+
+#
+# Verifica a validade do token
+def verify_token(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    """Verifica a validade do token."""
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user = db.query(User).filter_by(email=payload.get("sub")).first()
+        if not user:
+            raise HTTPException(status_code=401, detail={"success": False, "message": "User not found."})
+        return {
+            "success": True,
+            "message": "Token valid.",
+            "name": user.name,
+            "email": user.email
+        }
+    except JWTError:
+        raise HTTPException(status_code=401, detail={"success": False, "message": "Invalid token."})
+
+
+#
+# Status da API
 @app.get("/")
 async def root(db: Session = Depends(get_db)):
     """Status da API."""
@@ -51,19 +92,57 @@ async def login_user(user: LoginSchema, db: Session = Depends(get_db)):
     """Login de um usuário."""
     hashed_password = hashlib.sha256(user.password.encode()).hexdigest()
     existing_user = db.query(User).filter_by(email=user.email, password=hashed_password).first()
-    if (existing_user):
-        return {
-                "success": True,
-                "message": "User logged in",
-                "name": existing_user.name,
-                "email": existing_user.email
-            }
+    if (not existing_user):
+        raise HTTPException(status_code=401, detail={"success": False, "message": "User not found or password incorrect."})
     else:
+        access_token = create_access_token(data={"sub": existing_user.email})
+        refresh_token = create_access_token(data={"sub": existing_user.email}, expires_delta=timedelta(days=7))
         return {
-                "success": False,
-                "message": "User not found",
-            }
+            "success": True,
+            "message": "User logged in.",
+            "name": existing_user.name,
+            "email": existing_user.email,
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "Bearer"
+        }
 
+@app.post("/users/login-form")
+async def login_form_user(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """Login de um usuário."""
+    hashed_password = hashlib.sha256(user.password.encode()).hexdigest()
+    existing_user = db.query(User).filter_by(email=user.username, password=hashed_password).first()
+    if (not existing_user):
+        raise HTTPException(status_code=401, detail={"success": False, "message": "User not found or password incorrect."})
+    else:
+        access_token = create_access_token(data={"sub": existing_user.email})
+        refresh_token = create_access_token(data={"sub": existing_user.email}, expires_delta=timedelta(days=7))
+        return {
+            "success": True,
+            "message": "User logged in.",
+            "name": existing_user.name,
+            "email": existing_user.email,
+            "access_token": access_token,
+            "token_type": "Bearer"
+        }
+
+#
+# Atualiza o token de autenticação
+@app.get("/users/refresh-token")
+async def refresh_token(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    """Atualiza o token de autenticação."""
+    user = verify_token(token, db)
+    if not user:
+        raise HTTPException(status_code=401, detail={"success": False, "message": "User not found."})
+    access_token = create_access_token(data={"sub": user["email"]})
+    refresh_token = create_access_token(data={"sub": user["email"]}, expires_delta=timedelta(days=7))
+    return {
+        "success": True,
+        "message": "Token refreshed.",
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "Bearer"
+    }
 
 #
 # Cria um novo usuário
@@ -118,8 +197,11 @@ async def create_user(user: UserCreateSchema, db: Session = Depends(get_db)):
 #
 # Retorna todas as tasks de um usuário
 @app.get("/tasks/{username}")
-async def get_tasks(username: str, db: Session = Depends(get_db)):
+async def get_tasks(username: str, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     """Listagem de todas as tasks do usuário."""
+    user = verify_token(token, db)
+    if not user:
+        raise HTTPException(status_code=401, detail={"success": False, "message": "User not authenticated."})
     tasks = db.query(Task).filter(Task.username == username).order_by(Task.date).all()
 
     if not tasks:
