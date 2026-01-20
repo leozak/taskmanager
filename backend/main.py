@@ -20,7 +20,7 @@ load_dotenv()
 CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:5173")
 SECRET_KEY = os.getenv("SECRET_KEY", "79a9ebd164d2d36fab50c5bd4b2828b4e1325ec0c6b9c6d1c2b2c3b2c4b2c5b2")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 1
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login-form")
 
@@ -61,6 +61,7 @@ def verify_token(token: str = Depends(oauth2_scheme), db: Session = Depends(get_
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user = db.query(User).filter_by(email=payload.get("sub")).first()
+        print("async user:", user)
         if not user:
             raise HTTPException(status_code=401, detail={"success": False, "message": "User not found."})
         return {
@@ -96,7 +97,7 @@ async def login_user(user: LoginSchema, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail={"success": False, "message": "User not found or password incorrect."})
     else:
         access_token = create_access_token(data={"sub": existing_user.email})
-        refresh_token = create_access_token(data={"sub": existing_user.email}, expires_delta=timedelta(days=7))
+        refresh_token = create_access_token(data={"sub": existing_user.email, "type": "refresh"}, expires_delta=timedelta(days=7))
         return {
             "success": True,
             "message": "User logged in.",
@@ -116,26 +117,44 @@ async def login_form_user(user: OAuth2PasswordRequestForm = Depends(), db: Sessi
         raise HTTPException(status_code=401, detail={"success": False, "message": "User not found or password incorrect."})
     else:
         access_token = create_access_token(data={"sub": existing_user.email})
-        refresh_token = create_access_token(data={"sub": existing_user.email}, expires_delta=timedelta(days=7))
+        refresh_token = create_access_token(data={"sub": existing_user.email, "type": "refresh"}, expires_delta=timedelta(days=7))
         return {
             "success": True,
             "message": "User logged in.",
             "name": existing_user.name,
             "email": existing_user.email,
             "access_token": access_token,
+            "refresh_token": refresh_token,
             "token_type": "Bearer"
         }
 
+@app.get("/users/verify-token")
+async def validate_token(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    """Verifica a validade do token."""
+    user = verify_token(token, db)
+    print("verify_token not user:", not user)
+    if not user:
+        raise HTTPException(status_code=401, detail={"success": False, "message": "Invalid token."})
+    
+    return {
+        "success": True,
+        "message": "Token valid."
+    }
+
+
 #
 # Atualiza o token de autenticação
-@app.get("/users/refresh-token")
+@app.get("/refresh-token")
 async def refresh_token(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     """Atualiza o token de autenticação."""
     user = verify_token(token, db)
+
+    print ("user:", user)
+    
     if not user:
         raise HTTPException(status_code=401, detail={"success": False, "message": "User not found."})
     access_token = create_access_token(data={"sub": user["email"]})
-    refresh_token = create_access_token(data={"sub": user["email"]}, expires_delta=timedelta(days=7))
+    refresh_token = create_access_token(data={"sub": user["email"], "type": "refresh"}, expires_delta=timedelta(days=7))
     return {
         "success": True,
         "message": "Token refreshed.",

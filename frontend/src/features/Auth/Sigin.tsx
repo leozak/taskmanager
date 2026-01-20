@@ -2,6 +2,8 @@ import { PiUserCircleFill } from "react-icons/pi";
 import Theme from "../../components/Theme/Theme";
 import { useState } from "react";
 
+import { useAuthLogin } from "../../hooks/useUserLogin";
+
 type Props = {
   setNewUser: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -23,6 +25,8 @@ const Sigup = ({ setNewUser }: Props) => {
     error: false,
     message: "",
   });
+
+  const { mutate, isLoading, isError, isSuccess, error } = useAuthLogin();
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -70,9 +74,9 @@ const Sigup = ({ setNewUser }: Props) => {
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (formValidate()) {
-      console.log(email, password);
-    }
+    if (!formValidate()) return;
+    const response = mutate({ username: email, password: password });
+    console.log(response);
   };
 
   return (

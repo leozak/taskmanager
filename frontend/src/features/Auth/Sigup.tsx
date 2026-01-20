@@ -1,14 +1,9 @@
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 
 import { PiUserCirclePlusFill } from "react-icons/pi";
 
 import Theme from "../../components/Theme/Theme";
 
-import { API_URL } from "../../services/config";
-
-import { api } from "../../services/api";
 import { useUserMutate } from "../../hooks/useUserMutate";
 
 type Props = {
@@ -43,7 +38,7 @@ const Sigup = ({ setNewUser }: Props) => {
     message: "",
   });
 
-  const { data, mutate, isSuccess, isError, isPending } = useUserMutate();
+  const { data, mutate, isSuccess, isPending } = useUserMutate();
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
