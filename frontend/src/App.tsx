@@ -40,7 +40,7 @@ function App() {
     <>
       <div
         className={`
-          bg-white
+          bg-white text-zinc-800
           dark:bg-zinc-900 dark:text-zinc-300
           ${theme === "dark" ? "dark" : ""}
         `}
@@ -50,7 +50,7 @@ function App() {
             <Login />
           ) : (
             <DateProvider>
-              <div className="flex h-screen dark:bg-zinc-800">
+              <div className="flex h-screen bg-zinc-300 dark:bg-zinc-800">
                 <Sidebar />
                 <TaskManager />
               </div>
