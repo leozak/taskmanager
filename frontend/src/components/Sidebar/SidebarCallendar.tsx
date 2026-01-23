@@ -80,7 +80,7 @@ const SidebarCallendar = () => {
       </div>
 
       {/* Calendar Days */}
-      <div className="text-sm grid grid-cols-7 grid-rows-6 gap-1">
+      <div className="text-sm grid grid-cols-7 grid-rows-5 gap-1">
         {week.map((day, index) => (
           <div
             key={index}
@@ -92,12 +92,20 @@ const SidebarCallendar = () => {
         {daysClear.map((_, index) => (
           <div key={index}></div>
         ))}
-        {days.map((day, index) => (
+        {days.map((_day, index) => (
           <div
+            onClick={() => {
+              setDay(_day);
+            }}
             key={index}
-            className="text-center bg-zinc-800 hover:bg-zinc-700 rounded-md proportional-nums py-1 hover:cursor-pointer"
+            className={`
+              relative text-center justify-center hover:bg-zinc-700 rounded-md proportional-nums py-1 hover:cursor-pointer
+              ${_day == day ? "bg-zinc-700" : "bg-zinc-800"}`}
           >
-            {day}
+            {_day}
+            {daysHasTasks[_day - 1] && (
+              <div className="absolute bg-zinc-300/50 w-3 h-0.5 bottom-1 left-2 rounded-full"></div>
+            )}
           </div>
         ))}
       </div>
