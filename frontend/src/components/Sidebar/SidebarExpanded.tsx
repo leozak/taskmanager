@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import SidebarCallendar from "./SidebarCallendar";
 
 const SidebarExpanded = () => {
