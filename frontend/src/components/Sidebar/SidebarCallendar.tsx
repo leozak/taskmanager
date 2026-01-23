@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { months, week } from "../../sets/callendar";
 import { DateContext } from "../../contexts/DateContext";
-import { FaCalendar, FaCalendarAlt } from "react-icons/fa";
+import { FaCalendarAlt } from "react-icons/fa";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
 
 const SidebarCallendar = () => {
