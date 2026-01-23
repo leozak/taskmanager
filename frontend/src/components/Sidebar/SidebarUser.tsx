@@ -15,7 +15,7 @@ const SidebarUser = () => {
   const [closeConfirm, setCloseConfirm] = useState<boolean>(false);
   const email = (localStorage.getItem("email") || "") as string;
 
-  const { mutate, isSuccess, isPending } = useUserUpdate();
+  const { mutate, isSuccess } = useUserUpdate();
 
   const handleModalSubmit = () => {
     if (
