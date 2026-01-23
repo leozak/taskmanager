@@ -43,16 +43,14 @@ const Sidebar = () => {
           </h1>
         )}
       </div>
-      {isCollapsed ? (
-        <>
-          <SidebarCollapsed />
-        </>
-      ) : (
-        <>
-          <SidebarExpanded />
-        </>
-      )}
-      <div className="absolute flex flex-col gap-y-4 bottom-4 items-center">
+      {isCollapsed ? <SidebarCollapsed /> : <SidebarExpanded />}
+
+      <div
+        className={`
+          absolute flex bottom-4 items-center
+          ${isCollapsed ? "flex-col gap-y-4" : "flex-row-reverse gap-x-4"}
+        `}
+      >
         {/* USER MENU */}
         <SidebarUser />
 
