@@ -1,6 +1,27 @@
-import { createContext, useState } from "react";
+import React, {
+  createContext,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 
-export const DateContext = createContext({});
+interface DateContextType {
+  year: number;
+  setYear: Dispatch<SetStateAction<number>>;
+  month: number;
+  setMonth: Dispatch<SetStateAction<number>>;
+  day: number;
+  setDay: Dispatch<SetStateAction<number>>;
+}
+
+export const DateContext = createContext<DateContextType>({
+  year: 0,
+  setYear: () => {},
+  month: 0,
+  setMonth: () => {},
+  day: 0,
+  setDay: () => {},
+});
 
 const nowDate = new Date();
 
