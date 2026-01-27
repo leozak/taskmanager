@@ -14,7 +14,7 @@ const Sidebar = () => {
 
   return (
     <div
-      className={`absolute min-h-full p-3 bg-zinc-400 z-10
+      className={`absolute min-h-full p-3 bg-zinc-400 z-10 shadow shadow-black
                   sm:relative
                   ${isCollapsed ? "min-w-14" : "min-w-60"}
                   dark:bg-zinc-900`}
