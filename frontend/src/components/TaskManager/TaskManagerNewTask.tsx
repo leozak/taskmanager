@@ -1,16 +1,92 @@
 import { useEffect, useState } from "react";
 import { TiPlus } from "react-icons/ti";
 import { Modal } from "../Modal";
-import TagInput from "../Modal/Teste";
+
+import { useNewTask } from "../../hooks/useTasks";
+
+const nowDate = new Date();
 
 const TaskManagerNewTask = () => {
   const [addNewTask, setAddNewTask] = useState<boolean>(false);
-  const [done, setDone] = useState<boolean>(false);
+  const [closeConfirm, setCloseConfirm] = useState<boolean>(false);
+
+  const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
   const [tags, setTags] = useState<string[]>([]);
+  const [date, setDate] = useState<string>("");
+  const [done, setDone] = useState<boolean>(false);
+
+  const [errorTitle, setErrorTitle] = useState<string | null>(null);
+
+  const { data, mutate, isSuccess, isPending, error } = useNewTask();
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (title !== "" && description !== "" && tags.length === 0) {
+      setAddNewTask(false);
+      return;
+    }
+
+    let isOK = true;
+    if (title === "") {
+      setErrorTitle("Informe um título.");
+      isOK = false;
+    } else {
+      setErrorTitle(null);
+    }
+
+    if (isOK) {
+      const _tags = tags.join(",");
+      mutate({
+        title,
+        description,
+        tags: _tags,
+        pin: false,
+        done,
+        email: localStorage.getItem("email") as string,
+        date,
+      });
+    }
+  };
 
   useEffect(() => {
-    setTags(["11111", "22222", "33333"]);
-  }, []);
+    console.log(data);
+    if (data?.success) {
+      setAddNewTask(false);
+    }
+  }, [data]);
+
+  const handleClose = () => {
+    console.log("ModalClose");
+    if (title !== "" || description !== "" || tags.length !== 0) {
+      setCloseConfirm(true);
+      return;
+    }
+    setAddNewTask(false);
+  };
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value !== "") setErrorTitle(null);
+    setTitle(e.target.value);
+  };
+
+  useEffect(() => {
+    setCloseConfirm(false);
+    setTitle("");
+    setErrorTitle(null);
+    setDescription("");
+    setTags([]);
+    setDate(
+      nowDate.getFullYear() +
+        "-" +
+        (nowDate.getMonth() < 9 ? "0" : "") +
+        (nowDate.getMonth() + 1) +
+        "-" +
+        nowDate.getDate(),
+    );
+    setDone(false);
+  }, [addNewTask]);
 
   return (
     <>
@@ -25,19 +101,39 @@ const TaskManagerNewTask = () => {
       {/* ADD NEW TASK MODAL */}
       {addNewTask && (
         <Modal.Root>
+          {closeConfirm && (
+            <Modal.CloseConfirm>
+              <Modal.Cancel text="Não" onClick={() => setCloseConfirm(false)} />
+              <Modal.Confirm text="Sim" onClick={() => setAddNewTask(false)} />
+            </Modal.CloseConfirm>
+          )}
           <Modal.Header>
             <Modal.Title title="Nova Tarefa" />
             <Modal.Close callbackClose={() => setAddNewTask(false)} />
           </Modal.Header>
           <Modal.Body>
-            <Modal.InputText placeholder="Título" />
-            <Modal.TextArea placeholder="Descrição" className="mt-2" />
+            <Modal.InputText
+              value={title}
+              onChange={handleTitleChange}
+              placeholder="Título"
+              error={errorTitle}
+            />
+            <Modal.TextArea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Descrição"
+              className="mt-2"
+            />
             <Modal.InputTags
               placeholder="Etiquetas"
               tags={tags}
               setTags={setTags}
             />
-            <Modal.InputDate className="mt-2" />
+            <Modal.InputDate
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="mt-2"
+            />
             <Modal.InputCheckbox
               label="Concluida"
               checked={done}
@@ -46,8 +142,12 @@ const TaskManagerNewTask = () => {
             />
           </Modal.Body>
           <Modal.Actions>
-            <Modal.Confirm />
-            <Modal.Cancel />
+            <Modal.Cancel onClick={handleClose} />
+            <Modal.Confirm
+              text={isPending ? "Salvando..." : "Salvar"}
+              disabled={isPending || title === ""}
+              onClick={handleSubmit}
+            />
           </Modal.Actions>
         </Modal.Root>
       )}
