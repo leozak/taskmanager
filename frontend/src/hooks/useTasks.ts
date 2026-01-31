@@ -12,6 +12,8 @@ import type {
   TaskPinData,
   TaskPinResponse,
   TaskDeleteResponse,
+  TaskUpdateData,
+  TaskUpdateResponse,
 } from "../interfaces/tasks";
 
 export const useTasks = (email: string) => {
@@ -141,5 +143,42 @@ const changeTaskDelete = async (
   id: number,
 ): AxiosPromise<TaskDeleteResponse> => {
   const response = await api.delete<TaskDeleteResponse>(`/tasks/delete/${id}`);
+  return response;
+};
+
+//
+// Update task
+export const useTaskUpdate = () => {
+  const queryClient = useQueryClient();
+  const mutateUpdate = useMutation({
+    mutationKey: ["changeTaskUpdate"],
+    mutationFn: changeTaskUpdate,
+    retry: true,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
+  return {
+    ...mutateUpdate,
+    mutateUpdate: mutateUpdate.mutate,
+    isPendingUpdate: mutateUpdate.isPending,
+    isSuccessUpdate: mutateUpdate.isSuccess,
+    dataUpdate: mutateUpdate.data?.data,
+  };
+};
+
+const changeTaskUpdate = async (
+  task: TaskUpdateData,
+): AxiosPromise<TaskUpdateResponse> => {
+  const response = await api.put<TaskUpdateResponse>(
+    `/tasks/update/${task.id}`,
+    {
+      title: task.title,
+      description: task.description,
+      tags: task.tags,
+      done: task.done,
+      date: task.date,
+    },
+  );
   return response;
 };

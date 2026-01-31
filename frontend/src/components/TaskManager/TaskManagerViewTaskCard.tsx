@@ -202,7 +202,7 @@ const TaskManagerViewTaskCard = ({
                         title="Editar"
                         type="button"
                         onClick={() => setEditTask(!editTask)}
-                        className="text-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-300 hover:cursor-pointer active:scale-90"
+                        className="text-zinc-700 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-300 hover:cursor-pointer active:scale-90"
                       >
                         <RiFileEditFill className="w-6 h-6 mt-0.5" />
                       </button>
@@ -210,7 +210,7 @@ const TaskManagerViewTaskCard = ({
                         title="Apagar"
                         type="button"
                         onClick={() => setConfirmDeleteTask(true)}
-                        className="text-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-300 hover:cursor-pointer active:scale-90"
+                        className="text-zinc-700 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-300 hover:cursor-pointer active:scale-90"
                       >
                         <RiDeleteBinFill className="w-7 h-7" />
                       </button>

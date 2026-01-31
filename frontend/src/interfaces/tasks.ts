@@ -46,3 +46,10 @@ export interface TaskDeleteResponse {
   message: string;
   id?: number;
 }
+
+export interface TaskUpdateData extends Omit<Task, "pin" | "email"> {}
+
+export interface TaskUpdateResponse {
+  success: boolean;
+  message: string;
+}

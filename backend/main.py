@@ -325,22 +325,23 @@ async def create_task(task: TaskCreateSchema, token: str = Depends(oauth2_scheme
 class TaskUpdateSchema(BaseModel):
     title: str
     description: str
-    priority: int
-    pin: bool
+    tags: str
     done: bool
     date: str
 
 #
 # Altera uma task
 @app.put("/tasks/update/{id}")
-async def update_task(id: int, task: TaskUpdateSchema, db: Session = Depends(get_db)):
+async def update_task(id: int, task: TaskUpdateSchema, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     """Altera uma task."""
+    user_data = verify_token(token, db)
+    if not user_data:
+        raise HTTPException(status_code=401, detail={"success": False, "message": "User not authenticated."})
     try:
         db.query(Task).filter(Task.id == id).update({
             "title": task.title,
             "description": task.description,
-            "priority": task.priority,
-            "pin": task.pin,
+            "tags": task.tags,
             "done": task.done,
             "date": task.date
         })
@@ -348,13 +349,6 @@ async def update_task(id: int, task: TaskUpdateSchema, db: Session = Depends(get
         return {
             "success": True,
             "message": "Task updated",
-            "id": id,
-            "title": task.title,
-            "description": task.description,
-            "priority": task.priority,
-            "pin": task.pin,
-            "done": task.done,
-            "date": task.date
         }
     except Exception as e:
         db.rollback()
