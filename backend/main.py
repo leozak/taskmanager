@@ -247,7 +247,7 @@ async def get_tasks(email: str, token: str = Depends(oauth2_scheme), db: Session
     user = verify_token(token, db)
     if not user:
         raise HTTPException(status_code=401, detail={"success": False, "message": "User not authenticated."})
-    tasks = db.query(Task).filter(Task.email == email).order_by(Task.pin.desc(), Task.date).all()
+    tasks = db.query(Task).filter(Task.email == email).order_by(Task.done, Task.pin.desc(), Task.date).all()
 
     if not tasks:
         return {
@@ -325,22 +325,23 @@ async def create_task(task: TaskCreateSchema, token: str = Depends(oauth2_scheme
 class TaskUpdateSchema(BaseModel):
     title: str
     description: str
-    priority: int
-    pin: bool
+    tags: str
     done: bool
     date: str
 
 #
 # Altera uma task
 @app.put("/tasks/update/{id}")
-async def update_task(id: int, task: TaskUpdateSchema, db: Session = Depends(get_db)):
+async def update_task(id: int, task: TaskUpdateSchema, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     """Altera uma task."""
+    user_data = verify_token(token, db)
+    if not user_data:
+        raise HTTPException(status_code=401, detail={"success": False, "message": "User not authenticated."})
     try:
         db.query(Task).filter(Task.id == id).update({
             "title": task.title,
             "description": task.description,
-            "priority": task.priority,
-            "pin": task.pin,
+            "tags": task.tags,
             "done": task.done,
             "date": task.date
         })
@@ -348,13 +349,6 @@ async def update_task(id: int, task: TaskUpdateSchema, db: Session = Depends(get
         return {
             "success": True,
             "message": "Task updated",
-            "id": id,
-            "title": task.title,
-            "description": task.description,
-            "priority": task.priority,
-            "pin": task.pin,
-            "done": task.done,
-            "date": task.date
         }
     except Exception as e:
         db.rollback()
@@ -394,8 +388,11 @@ class TaskDoneSchema(BaseModel):
     done: bool
 
 @app.patch("/tasks/done/{id}")
-async def done_task(id: int, task: TaskDoneSchema, db: Session = Depends(get_db)):
+async def done_task(id: int, task: TaskDoneSchema, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     """Muda o status de conclusão de uma task."""
+    user_data = verify_token(token, db)
+    if not user_data:
+        raise HTTPException(status_code=401, detail={"success": False, "message": "User not authenticated."})
     try:
         db.query(Task).filter(Task.id == id).update({"done": task.done})
         db.commit()
@@ -421,8 +418,11 @@ class TaskPinSchema(BaseModel):
     pin: bool
 
 @app.patch("/tasks/pin/{id}")
-async def pin_task(id: int, task: TaskPinSchema, db: Session = Depends(get_db)):
+async def pin_task(id: int, task: TaskPinSchema, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     """Fixa ou desafixa uma tarefa."""
+    user_data = verify_token(token, db)
+    if not user_data:
+        raise HTTPException(status_code=401, detail={"success": False, "message": "User not authenticated."})
     try:
         db.query(Task).filter(Task.id == id).update({"pin": task.pin})
         db.commit()

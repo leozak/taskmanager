@@ -2,8 +2,10 @@ import React, {
   useRef,
   useState,
   type InputHTMLAttributes,
-  type KeyboardEvent,
+  type KeyboardEvent
 } from "react";
+
+import { useTags } from "../../contexts/TagsContext";
 
 interface ModalInputTagsProps extends InputHTMLAttributes<HTMLInputElement> {
   tags: string[];
@@ -22,6 +24,8 @@ const ModalInputTags = ({
   const [inputValue, setInputValue] = useState<string>("");
 
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const { getTagColor } = useTags();
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     // Adiciona tag quando pressiona Enter ou vírgula
@@ -74,7 +78,8 @@ const ModalInputTags = ({
         {tags.map((tag, index) => (
           <span
             key={index}
-            className="inline-flex dark:text-zinc-300 bg-zinc-400 dark:bg-zinc-700 text-xs sm:text-sm font-medium rounded-md items-center gap-1 px-2"
+            className={`inline-flex dark:text-zinc-300  text-xs sm:text-sm font-medium rounded-md items-center gap-1 px-2
+                        ${getTagColor(tag)}`}
           >
             {tag}
             <button

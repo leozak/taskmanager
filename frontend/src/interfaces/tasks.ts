@@ -22,3 +22,34 @@ export interface TasksResponse {
   message: string;
   tasks: Omit<Task, "email">[];
 }
+
+export interface TaskDoneData extends Pick<Task, "id" | "done"> {}
+
+export interface TaskDoneResponse {
+  success: boolean;
+  message: string;
+  id?: number;
+  done?: boolean;
+}
+
+export interface TaskPinData extends Pick<Task, "id" | "pin"> {}
+
+export interface TaskPinResponse {
+  success: boolean;
+  message: string;
+  id?: number;
+  pin?: boolean;
+}
+
+export interface TaskDeleteResponse {
+  success: boolean;
+  message: string;
+  id?: number;
+}
+
+export interface TaskUpdateData extends Omit<Task, "pin" | "email"> {}
+
+export interface TaskUpdateResponse {
+  success: boolean;
+  message: string;
+}
