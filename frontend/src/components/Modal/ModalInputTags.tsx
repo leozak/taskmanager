@@ -4,7 +4,6 @@ import React, {
   type InputHTMLAttributes,
   type KeyboardEvent
 } from "react";
-import { colors } from "../../sets/colors";
 
 import { useTags } from "../../contexts/TagsContext";
 
